@@ -1,0 +1,41 @@
+{% extends "links/base.html" %}
+
+{% block content %}
+
+{% if is_paginated %}
+    <ol start="{{ page_obj.start_index }}">
+{% else %}
+    <ol>
+{% endif %}
+
+{% for link in object_list %}
+<form method="post" action="{% url 'vote' %}" class="vote_form">
+    {% csrf_token %}
+    <li> Total Vote:
+        <span class="link_total_votes">{{ link.votes.count }}</span> | 
+<input type="hidden" id="id_link" name="link" class="hidden_id" value="{{ link.pk }}" />
+<input type="hidden" id="id_voter" name="voter" class="hidden_id" value="{{ user.pk }}" />
+{% if not user.is_authenticated %}
+    <button disabled title="Please login to vote">/button>
+{% elif link.pk not in voted %}
+<button class="voting_button">+</button>
+{% else %}
+<button class="voting_button">-</button>
+{% endif %}
+<a href="{% url 'link_detail' pk=link.pk %}">
+    <b>{{ link.title }}</b>
+</a>
+</li>
+</form>    
+{% endfor %}
+</ol>
+
+{% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">More &raquo;</a>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}
